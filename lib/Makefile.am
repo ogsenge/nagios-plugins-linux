@@ -48,7 +48,7 @@ endif
 
 if HAVE_LIBPROCPS
 libutils_a_SOURCES += \
-	vminfo-procps.c
+	vminfo_procps.c
 else
 libutils_a_SOURCES += \
 	vminfo.c
