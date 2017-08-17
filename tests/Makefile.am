@@ -49,12 +49,8 @@ test_programs = \
 	tslibmeminfo_conversions \
 	tslibmeminfo_interface \
 	tslibmeminfo_procparser \
-	tslibmessages
-if !HAVE_LIBPROCPS
-test_programs += \
-	tslibvminfo
-endif
-test_programs += \
+	tslibmessages \
+	tslibvminfo \
 	tsclock_thresholds \
 	tscswch \
 	tsintr  \
