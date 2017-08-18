@@ -196,14 +196,14 @@ mymain (void)
   return ret == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
+TEST_MAIN (mymain)
+
 #else
 
-static int
-mymain (void)
+int
+main (void)
 {
   return EXIT_AM_SKIP;
 }
 
 #endif			/* HAVE_LIBPROCPS */
-
-TEST_MAIN (mymain)
