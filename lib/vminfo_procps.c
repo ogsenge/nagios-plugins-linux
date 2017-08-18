@@ -2,7 +2,9 @@
  * License: GPLv3+
  * Copyright (c) 2017 Davide Madrisan <davide.madrisan@gmail.com>
  *
- * A library for checking memory and swap usage on linux
+ * A library for checking memory and swap usage on linux.
+ * This library is a front-end for `procps-newlib':
+ * 	https://gitlab.com/madrisan/procps/tree/newlib
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,15 +71,15 @@ proc_vmem_unref (struct proc_vmem *vmem)
 #define proc_vmem_get(arg, item) \
 unsigned long proc_vmem_get_ ## arg (struct proc_vmem *p) \
   { return (p == NULL) ? 0 : VMSTAT_GET(p->info, item, ul_int); }
+
 proc_vmem_get (pgfault, VMSTAT_PGFAULT)
 proc_vmem_get (pgfree, VMSTAT_PGFREE)
 proc_vmem_get (pgmajfault, VMSTAT_PGMAJFAULT)
 proc_vmem_get (pgpgin, VMSTAT_PGPGIN) proc_vmem_get (pgpgout, VMSTAT_PGPGOUT)
 proc_vmem_get (pswpin, VMSTAT_PSWPIN)
 proc_vmem_get (pswpout, VMSTAT_PSWPOUT)
-#undef proc_vmem_get
 
-#define GET_DATA(item) VMSTAT_GET(vmem->info, item, ul_int)
+#undef proc_vmem_get
 
 /*
  * DMA memory zone:
@@ -100,6 +102,9 @@ proc_vmem_get (pswpout, VMSTAT_PSWPOUT)
  *
  * cat /proc/pagetypeinfo
  */
+
+#define GET_DATA(item) VMSTAT_GET(vmem->info, item, ul_int)
+
 unsigned long
 proc_vmem_get_pgsteal (struct proc_vmem *vmem)
 {
