@@ -200,7 +200,7 @@ static int
 check_for_faulty_paths (char *buf, size_t bufsize)
 {
   char *str1, *saveptr1;
-  char *dm_st_ok_pattern = "[ \t]+\\[?active\\]?[ \t]*\\[?ready\\]?[ \t]+";
+  char *dm_st_ok_pattern = "[ \t]+(active)[ \t]*(ready|ghost)[ \t]*running";
   int rc, row, faulty_paths = 0;
   regex_t regex;
 
@@ -261,8 +261,8 @@ main (int argc, char **argv)
 	}
     }
 
-  if (getuid () != 0)
-    plugin_error (STATE_UNKNOWN, 0, "need to be root");
+//  if (getuid () != 0)
+//    plugin_error (STATE_UNKNOWN, 0, "need to be root");
 
   multipathd_query ("show paths", buffer, sizeof (buffer));
   faulty_paths = check_for_faulty_paths (buffer, bufsize);
