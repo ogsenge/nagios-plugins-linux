@@ -200,22 +200,43 @@ static int
 check_for_faulty_paths (char *buf, size_t bufsize)
 {
   char *str1, *saveptr1;
-  char *dm_st_ok_pattern = "[ \t]+(active)[ \t]*(ready|ghost)[ \t]*running";
+  char *dm_st_ok_pattern = "[ \t]+(active)[ \t]*(ready|ghost)[ \t]*running$";
+  char *dm_ignore_pattern = "^\\[orphan\\]";
   int rc, row, faulty_paths = 0;
-  regex_t regex;
+  regex_t regex,regex_ignore;
 
   if ((rc = regcomp (&regex, dm_st_ok_pattern, REG_EXTENDED | REG_NOSUB)))
     {
       regerror (rc, &regex, buf, bufsize);
       plugin_error (STATE_UNKNOWN, 0, "regcomp() failed: %s", buf);
     }
+  if ((rc = regcomp (&regex_ignore, dm_ignore_pattern, REG_EXTENDED | REG_NOSUB)))
+    {
+      regerror (rc, &regex_ignore, buf, bufsize);
+      plugin_error (STATE_UNKNOWN, 0, "regcomp() failed: %s", buf);
+    }
 
   /* data format:
-   *       hcil    dev dev_t  pri dm_st   chk_st  next_check
-   *   ex: 4:0:0:0 sdb 8:16   10  [active][ready] XXX....... 7/20
-   * -or-
-   *       hcil    dev dev_t pri dm_st  chk_st dev_st  next_check
-   *   ex: 6:0:0:0 sdf 8:80  1   active ready  running XXXX...... 9/20  */
+   [orphan]  [undef]      sda  undef  undef  unknown
+   rootLUN   0000:10:02.0 sdd  active ghost  running
+   extLUN    0000:10:02.0 sde  active ghost  running
+   rootLUN   0000:10:02.0 sdg  active ready  running
+   extLUN    0000:10:02.0 sdi  active ready  running
+   rootLUN   0000:10:02.0 sdk  active ghost  running
+   extLUN    0000:10:02.0 sdm  active ghost  running
+   rootLUN   0000:10:02.0 sdo  active ready  running
+   extLUN    0000:10:02.0 sdq  active ready  running
+   rootLUN   0000:10:02.0 sdf  active ghost  running
+   extLUN    0000:10:02.0 sdh  active ghost  running
+   rootLUN   0000:10:02.0 sdj  active ready  running
+   extLUN    0000:10:02.0 sdl  active ready  running
+   rootLUN   0000:10:02.0 sdn  active ready  running
+   extLUN    0000:10:02.0 sdp  active ready  running
+   rootLUN   0000:10:02.0 sdr  active ghost  running
+   extLUN    0000:10:02.0 sds  active ghost  running
+   [orphan]  0000:30:00.0 sdb  undef  undef  unknown
+   [orphan]  0000:30:00.0 sdc  undef  undef  unknown
+   */
 
   for (row = 1, str1 = buf;; row++, str1 = NULL)
     {
@@ -226,9 +247,15 @@ check_for_faulty_paths (char *buf, size_t bufsize)
 	printf ("%s\n", token);
       if (row > 1 && regexec (&regex, token, (size_t) 0, NULL, 0))
 	{
-	  faulty_paths++;
-	  if (verbose)
-	    printf (" \\ faulty path detected!\n");
+          if ( regexec (&regex_ignore, token, (size_t) 0, NULL, 0) )
+          { 
+	    faulty_paths++;
+	    if (verbose)
+	      printf (" \\ faulty path detected!\n");
+          } else {
+	    if (verbose)
+	      printf (" \\ Ignore!\n");
+          }
 	}
     }
 
@@ -264,7 +291,7 @@ main (int argc, char **argv)
 //  if (getuid () != 0)
 //    plugin_error (STATE_UNKNOWN, 0, "need to be root");
 
-  multipathd_query ("show paths", buffer, sizeof (buffer));
+  multipathd_query ("show paths format \"%m %a %d %t %T %o\"", buffer, sizeof (buffer));
   faulty_paths = check_for_faulty_paths (buffer, bufsize);
 
   if (faulty_paths > 0)
