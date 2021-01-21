@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.59])
 
-AC_INIT([nagios-plugins-linux],[25],
+AC_INIT([nagios-plugins-linux],[28],
         [davide.madrisan@gmail.com])
 
 AC_CANONICAL_TARGET
@@ -64,6 +64,18 @@ if test "$cross_compiling" = no; then
   fi
 fi
 
+# Linux Alpine shipis with musl libc
+AC_MSG_CHECKING(for musl libc)
+dumpmachine=`$CC -dumpmachine`
+case "$dumpmachine" in
+*-musl)
+  AC_MSG_RESULT([yes])
+  AC_DEFINE([LIBC_MUSL], [1], [Define to 1 if libc is musl])
+  ;;
+*)
+  AC_MSG_RESULT([no]) ;;
+esac
+
 dnl Check for variable-length arrays support
 AC_MSG_CHECKING(for variable-lenght arrays)
 AC_COMPILE_IFELSE(
@@ -106,6 +118,7 @@ cc_TRY_CFLAGS([-Wall])
 cc_TRY_CFLAGS([-Wformat])
 cc_TRY_CFLAGS([-Wformat -Wformat-security])
 cc_TRY_CFLAGS([-Wformat-signedness])
+cc_TRY_CFLAGS([-Wimplicit-fallthrough=2])
 cc_TRY_CFLAGS([-Wmissing-noreturn])
 cc_TRY_CFLAGS([-Wmissing-format-attribute])
 cc_TRY_CFLAGS([-Wredundant-decls])
@@ -219,6 +232,7 @@ AC_CHECK_HEADERS([ \
   netinet/in.h \
   sys/mount.h \
   sys/param.h \
+  sys/resource.h \
   sys/socket.h \
   sys/sysctl.h \
   sys/sysinfo.h \
@@ -227,7 +241,10 @@ AC_CHECK_HEADERS([ \
   sys/swap.h \
   utmpx.h])
 
-AC_CHECK_HEADERS(linux/if_link.h, [], [],
+AC_CHECK_HEADERS([ \
+  linux/if_link.h \
+  linux/if.h \
+  linux/wireless.h], [], [],
 [
 #if HAVE_SYS_TYPES_H
 # include <sys/types.h>
@@ -236,6 +253,14 @@ AC_CHECK_HEADERS(linux/if_link.h, [], [],
 # include <sys/socket.h>
 #endif
 ])
+
+dnl check for headers required by the netinfo* libraries
+AC_CHECK_HEADERS([ \
+  linux/ethtool.h \
+  linux/netlink.h \
+  linux/rtnetlink.h \
+  linux/sockios.h], [],
+  [AC_MSG_ERROR([please install linux network headers])])
 
 dnl Checks for functions and libraries
 
@@ -321,10 +346,10 @@ AC_ARG_ENABLE([libprocps],
     [enable_libprocps=$enableval],[enable_libprocps=no])
 AS_IF([test "x$enable_libprocps" = "xyes"], [
   PKG_CHECK_EXISTS([libprocps],
-    [PKG_CHECK_MODULES(LIBPROCPS, [libprocps = UNKNOWN],
+    [PKG_CHECK_MODULES(LIBPROCPS, [libprocps >= 3.3.11],
       [AC_DEFINE(HAVE_LIBPROCPS, 1, [Define if libprocps is available])
        have_libprocps=yes],
-      AC_MSG_ERROR([*** libprocps version UNKNOWN not found]))])
+      AC_MSG_ERROR([*** libprocps version >= 3.3.11 not found]))])
   AC_SUBST(LIBPROCPS_LIBS)
   AC_SUBST(LIBPROCPS_CFLAGS)
   AS_IF([test "x$have_libprocps" = "xno" -a "x$enable_libprocps" = "xyes"],
@@ -521,6 +546,12 @@ echo "  CFLAGS             = $CFLAGS"
 echo "  LDFLAGS            = $LDFLAGS"
 echo
 
+if test "$have_libprocps" = "yes"; then
+  echo "  LIBPROCPS_CFLAGS   = $LIBPROCPS_CFLAGS"
+  echo "  LIBPROCPS_LIBS     = $LIBPROCPS_LIBS"
+  echo
+fi
+
 if test "$libcurl_cv_lib_curl_usable" = "yes"; then
   echo "  LIBCURL_CPPFLAGS   = $LIBCURL_CPPFLAGS"
   echo "  LIBCURL            = $LIBCURL"
@@ -528,6 +559,6 @@ if test "$libcurl_cv_lib_curl_usable" = "yes"; then
 fi
 
 if test "$have_libvarlink" = "yes"; then
-  echo "  VARLINK_ADDRESS   = $VARLINK_ADDRESS"
+  echo "  VARLINK_ADDRESS    = $VARLINK_ADDRESS"
   echo
 fi

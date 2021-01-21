@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 /*
  * License: GPLv3+
  * Copyright (c) 2014,2015 Davide Madrisan <davide.madrisan@gmail.com>
@@ -31,7 +32,7 @@
 #include "progname.h"
 #include "progversion.h"
 #include "thresholds.h"
-#include "xstrtol.h"
+#include "xstrton.h"
 
 static const char *program_copyright =
   "Copyright (C) 2014,2015 Davide Madrisan <" PACKAGE_BUGREPORT ">\n";

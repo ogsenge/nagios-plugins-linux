@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 /*
  * License: GPLv3+
  * Copyright (c) 2020 Davide Madrisan <davide.madrisan@gmail.com>
@@ -38,8 +39,7 @@ json_token_streq (const char *json, jsmntok_t * tok, const char *s)
 char *
 json_token_tostr (char *json, jsmntok_t * t)
 {
-  json[t->end] = '\0';
-  return json + t->start;
+  return xsubstrdup (json + t->start, t->end - t->start);
 }
 
 jsmntok_t *
@@ -47,6 +47,8 @@ json_tokenise (const char *json, size_t *ntoken)
 {
   jsmn_parser parser;
   int r, ret;
+
+  assert (NULL != json);
 
   jsmn_init (&parser);
   r = jsmn_parse (&parser, json, strlen (json), NULL, 0);

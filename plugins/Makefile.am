@@ -27,6 +27,11 @@ AM_LDFLAGS = $(LIBPROCPS_LIBS)
 LN_S=@LN_S@
 
 check_cpu_programs = check_iowait
+check_network_programs = \
+	check_network_collisions \
+	check_network_dropped    \
+	check_network_errors     \
+	check_network_multicast
 
 libexec_PROGRAMS =        \
 	check_clock       \
@@ -40,6 +45,7 @@ libexec_PROGRAMS =        \
 	check_nbprocs     \
 	check_network     \
 	check_paging      \
+	check_pressure    \
 	check_readonlyfs  \
 	check_temperature \
 	check_tcpcount    \
@@ -87,6 +93,7 @@ check_paging_SOURCES     = check_paging.c
 if HAVE_LIBVARLINK
 check_podman_SOURCES     = check_podman.c
 endif
+check_pressure_SOURCES   = check_pressure.c
 check_readonlyfs_SOURCES = check_readonlyfs.c
 if HAVE_PROC_MEMINFO
 check_swap_SOURCES       = check_swap.c
@@ -112,12 +119,12 @@ if HAVE_LIBCURL
 check_docker_LDADD       = $(LDADD) $(LIBCURL) -lm
 endif
 if HAVE_PROC_MEMINFO
-check_memory_LDADD       = $(LDADD)
+check_memory_LDADD       = $(LDADD) $(LIBPROCPS_LIBS)
 endif
 check_nbprocs_LDADD      = $(LDADD)
-check_network_LDADD      = $(LDADD)
+check_network_LDADD      = $(LDADD) -lm
 check_multipath_LDADD    = $(LDADD)
-check_paging_LDADD       = $(LDADD)
+check_paging_LDADD       = $(LDADD) $(LIBPROCPS_LIBS)
 if HAVE_LIBVARLINK
 check_podman_LDADD       = $(LDADD) $(LIBVARLINK_LIBS)
 endif
@@ -130,11 +137,15 @@ check_temperature_LDADD  = $(LDADD)
 check_uptime_LDADD       = $(LDADD)
 check_users_LDADD        = $(LDADD)
 
-all-local: $(check_cpu_programs)
+all-local: $(check_cpu_programs) $(check_network_programs)
 
 $(check_cpu_programs): check_cpu
 	rm -f $@
 	$(LN_S) -s check_cpu $@
+
+$(check_network_programs): check_network
+	rm -f $@
+	$(LN_S) -s check_network $@
 
 install-exec-hook:
 	cd $(DESTDIR)$(libexecdir) && \

@@ -5,8 +5,8 @@
 
 ![Release Status](https://img.shields.io/badge/status-stable-brightgreen.svg)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](https://spdx.org/licenses/GPL-3.0.html)
-[![Download Latest Release](https://img.shields.io/badge/download-latest--tarball-blue.svg)](https://github.com/madrisan/nagios-plugins-linux/releases/download/v25/nagios-plugins-linux-25.tar.xz)
-[![SayThanks](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/madrisan)
+[![Download Latest Release](https://img.shields.io/badge/download-latest--tarball-blue.svg)](https://github.com/madrisan/nagios-plugins-linux/releases/download/v28/nagios-plugins-linux-28.tar.xz)
+[![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/davide.madrisan@gmail.com)
 
 [![Build Status](https://travis-ci.org/madrisan/nagios-plugins-linux.svg?branch=master)](https://travis-ci.org/madrisan/nagios-plugins-linux)
 [![Coverity Scan Build Status](https://img.shields.io/coverity/scan/3779.svg)](https://scan.coverity.com/projects/madrisan-nagios-plugins-linux)
@@ -15,8 +15,7 @@
 
 ---------------
 
-![alt tag](https://madrisan.files.wordpress.com/2015/11/nagios-plugins-linux-logo-256.png)
-
+![alt tag](nagios-plugins-linux-logo-256.png)
 
 ## About
 
@@ -25,27 +24,33 @@ Nagios is an open source computer system monitoring, network monitoring and infr
 
 Here is the list of the available plugins:
 
-* **check_clock** - returns the number of seconds elapsed between local time and Nagios server time 
-* **check_cpu** - checks the CPU (user mode) utilization 
+* **check_clock** - returns the number of seconds elapsed between local time and Nagios server time
+* **check_cpu** - checks the CPU (user mode) utilization
 * **check_cpufreq** - displays the CPU frequency characteristics
 * **check_cswch** - checks the total number of context switches across all CPUs
-* **check_docker** - checks the number of running docker containers :new: (:warning: *alpha*, requires *libcurl* version 7.40.0+)
+* **check_docker** - checks the number of running docker containers (:warning: *alpha*, requires *libcurl* version 7.40.0+)
 * **check_fc** - monitors the status of the fiber status ports
 * **check_ifmountfs** - checks whether the given filesystems are mounted
 * **check_intr** - monitors the total number of system interrupts
-* **check_iowait** - monitors the I/O wait bottlenecks 
-* **check_load** - checks the current system load average 
-* **check_memory** - checks the memory usage 
-* **check_multipath** - checks the multipath topology status 
-* **check_nbprocs** - displays the number of running processes per user 
-* **check_network** - displays some network interfaces statistics 
-* **check_paging** - checks the memory and swap paging 
-* **check_readonlyfs** - checks for readonly filesystems 
-* **check_swap** - checks the swap usage 
-* **check_tcpcount** - checks the tcp network usage 
-* **check_temperature** - monitors the hardware's temperature 
-* **check_uptime** - checks how long the system has been running 
-* **check_users** - displays the number of users that are currently logged on 
+* **check_iowait** - monitors the I/O wait bottlenecks
+* **check_load** - checks the current system load average
+* **check_memory** - checks the memory usage
+* **check_multipath** - checks the multipath topology status
+* **check_nbprocs** - displays the number of running processes per user
+* **check_network** - displays some network interfaces statistics. The following plugins are symlinks to *check_network*:
+  * check_network_collisions
+  * check_network_dropped
+  * check_network_errors
+  * check_network_multicast
+* **check_paging** - checks the memory and swap paging
+* **check_pressure** - checks Linux Pressure Stall Information (PSI) data :new:
+* **check_podman** - monitor the status of podman containers (:warning: *beta*, requires *libvarlink*)
+* **check_readonlyfs** - checks for readonly filesystems
+* **check_swap** - checks the swap usage
+* **check_tcpcount** - checks the tcp network usage
+* **check_temperature** - monitors the hardware's temperature
+* **check_uptime** - checks how long the system has been running
+* **check_users** - displays the number of users that are currently logged on
 
 ## Full documentation
 
@@ -56,8 +61,11 @@ in the GitHub [wiki page](https://github.com/madrisan/nagios-plugins-linux/wiki)
 
 This package uses `GNU autotools` for configuration and installation.
 
-If you have cloned the git repository then you will need to run
-`autoreconf --install` to generate the required files.
+If you have cloned the git repository
+
+        git clone --recurvise https://github.com/madrisan/nagios-plugins-linux.git
+
+then you will need to run `autoreconf --install` to generate the required files.
 
 Run `./configure --help` to see a list of available install options.
 The plugin will be installed by default into `LIBEXECDIR`.
@@ -91,33 +99,36 @@ the API of the library `libprocps.so.5`
 This library is still under active development and no stable version has
 been released yet. 
 
-## Supported Platforms
+## Supported Platforms and Linux distributions
 
 This package is written in plain C, making as few assumptions as possible, and
-sticking closely to ANSI C/POSIX. 
+sticking closely to ANSI C/POSIX.
 A C99-compliant compiler is required anyway.
 
 This package is known to compile with:
-* gcc 4.1.2 (RHEL 5 / CentOS 5),
+* gcc 4.1 (RHEL 5 / CentOS 5),
 * gcc 4.4 (RHEL6 / CentOS 6),
-* gcc 4.8.2 (RHEL7 / CentOS 7),
-* gcc 5.1.1, 5.3.1, 6.3.1, 7.2.1, 7.3.1, 8.0.1, 8.2.1, 9.1.1 (Fedora 23 Cloud, Fedora 25 to 30),
-* clang 3.7.0, 3.8.0, 5.0.1, 6.0.0, 7.0.0, 8.0.0 (Fedora 23 Cloud, Fedora 25 to 30),
-* gcc 4.9.0-4.9.2, 5.2.0, 5.3.0, 6.2.0 (openmamba GNU/Linux 2.90+),
-* clang 3.1, 3.5.1, and 3.8.1 (openmamba GNU/Linux 2.90+).
+* gcc 4.8 (RHEL7 / CentOS 7),
+* gcc 3.x, 5.1, 5.3, 6.3, 7, 8, 9, 10 (openmamba GNU/Linux, Debian 8+, Fedora 25+),
+* clang 3.7, 3.8, 4.9, 5, 6, 7, 8, 10, 11 (openmamba GNU/Linux, Fedora 25+),
 
 List of the Linux kernels that have been successfully tested:
 * 2.6.18, 2.6.32,
 * 3.10, 3.14, 3.18,
 * 4.2, 4.4, 4,9, 4.14, 4.15, 4.16, 4.19
+* 5.6, 5.7, 5.8
 
+The Nagios Plugins Linux are regularly tested on
+ * Alpine Linux (musl libc),
+ * Debian, CentOS, Fedora, Gentoo, and Ubuntu (GNU C Library (glibc)).
 
-## CentOS/RHEL, Debian, and Fedora Packages
+## Alpine, CentOS/RHEL, Debian, and Fedora Packages
 
 The `.rpm` and `.deb` packages for CentOS/RHEL, Debian, and Fedora can be built using the following commands
 
 Command            | Distribution
 ------------------ | ------------
+Alpine 3.12        | `make -C packages alpine-3.12`
 CentOS 5           | `make -C packages centos-5`
 CentOS 6           | `make -C packages centos-6`
 CentOS 7           | `make -C packages centos-7`
@@ -125,17 +136,21 @@ CentOS 8           | `make -C packages centos-8`
 Debian 8 (Jessie)  | `make -C packages debian-jessie`
 Debian 9 (Stretch) | `make -C packages debian-stretch`
 Debian 10 (Buster) | `make -C packages debian-buster`
-Fedora 29          | `make -C packages fedora-29`
-Fedora 30          | `make -C packages fedora-30`
 Fedora 31          | `make -C packages fedora-31`
+Fedora 32          | `make -C packages fedora-32`
+Fedora 33          | `make -C packages fedora-33`
 Fedora Rawhide     | `make -C packages fedora-rawhide`
 
 in the root source folder.
 The building process requires the _Docker_ software containerization platform running on your system, and an internet connection to download the Docker images of the operating systems you want to build the packages for.
 
-On *Fedora 31* you can use the native *Podman* pod manager along with the Docker CLI emulation script:
+On *Fedora* you can use the native *Podman* pod manager along with the Docker CLI emulation script:
 
     sudo install dnf podman podman-docker
+
+_Note_: the previous make commands can end with a `permission denied` error if *selinux* is configured in enforcing mode.
+In this case you can temporarily disable *selinux* by executing as root the command `setenforce 0`
+(or maybe share a better solution!).
 
 ## Gentoo Package
 
@@ -143,7 +158,7 @@ The plugins are available [in the Gentoo tree](https://packages.gentoo.org/packa
 ```
 emerge -av net-analyzer/nagios-plugins-linux-madrisan
 ```
-The `curl` USE flag is required to build `check_docker`.
+The USE flags `curl` and `varlink` are required to respectively build `check_docker` and `check_podman`.
 
 ## Bugs
 

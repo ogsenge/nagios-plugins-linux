@@ -20,7 +20,8 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-DDOCKER_SOCKET=\"$(DOCKER_SOCKET)\" \
 	-DVARLINK_ADDRESS=\"$(VARLINK_ADDRESS)\" \
-	$(LIBCURL_CPPFLAGS)
+	$(LIBCURL_CPPFLAGS) \
+	$(LIBPROCPS_CPPFLAGS)
 
 noinst_LIBRARIES = libutils.a
 
@@ -37,7 +38,9 @@ libutils_a_SOURCES =  \
 	messages.c    \
 	mountlist.c   \
 	netinfo.c     \
+	netinfo-private.c \
 	perfdata.c    \
+	pressure.c    \
 	processes.c   \
 	procparser.c  \
 	progname.c    \
@@ -47,7 +50,7 @@ libutils_a_SOURCES =  \
 	url_encode.c  \
 	xasprintf.c   \
 	xmalloc.c     \
-	xstrtol.c
+	xstrton.c
 
 if HAVE_LIBCURL
   libutils_a_SOURCES += \
@@ -56,7 +59,9 @@ endif
 
 if HAVE_LIBVARLINK
   libutils_a_SOURCES += \
-	container_podman.c
+	container_podman.c \
+	container_podman_count.c \
+	container_podman_stats.c
 endif
 
 if HAVE_LIBPROCPS

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Multi-platform build system
-# Copyright (C) 2016-2019 Davide Madrisan <davide.madrisan@gmail.com>
+# Copyright (C) 2016-2020 Davide Madrisan <davide.madrisan@gmail.com>
 
 PROGNAME="${0##*/}"
 PROGPATH="${0%/*}"
@@ -33,9 +33,9 @@ Where:
    -u|--uid    : user ID of the user 'developer' used for building the software
 
 Supported distributions:
-   CentOS 5/6/7
+   CentOS 5/6/7/8
    Debian jessie/stretch/buster
-   Fedora 28/29/30/rawhide
+   Fedora 31/32/33/rawhide
 
 Example:
        $0 -s $PROGPATH/../../nagios-plugins-linux:/shared:rw \\
@@ -50,7 +50,7 @@ __EOF
 help () {
    cat <<__EOF
 $PROGNAME v$REVISION - containerized software build checker
-Copyright (C) 2016-2019 Davide Madrisan <davide.madrisan@gmail.com>
+Copyright (C) 2016-2020 Davide Madrisan <davide.madrisan@gmail.com>
 
 __EOF
 
@@ -129,6 +129,13 @@ ipaddr="$(container_property --ipaddr "$container")"
 os="$(container_property --os "$container")"
 
 case "$os" in
+   alpine-*)
+      pck_format="apk"
+      pck_install="apk add"
+      pcks_dev="alpine-sdk curl-dev"
+      have_libcurl="1"
+      have_libvarlink="0"
+   ;;
    centos-*)
       pck_format="rpm"
       pck_install="yum install -y"
@@ -136,6 +143,7 @@ case "$os" in
       pcks_dev="bzip2 make gcc libcurl-devel xz rpm-build"
       # requires libcurl-devel 7.40.0+ which is not available in < CentOS 8
       case "$os" in centos-8.*) have_libcurl="1" ;; *) have_libcurl="0" ;; esac
+      have_libvarlink="0"
    ;;
    debian-*)
       pck_format="deb"
@@ -149,8 +157,9 @@ build-essential bzip2 debhelper fakeroot make gcc xz-utils devscripts"
       pck_format="rpm"
       pck_install="dnf install -y"
       pck_dist=".fc${os:7:2}"
-      pcks_dev="bzip2 make gcc libcurl-devel xz rpm-build"
-      have_libcurl="1" ;;
+      pcks_dev="bzip2 make gcc libcurl-devel libvarlink-devel xz rpm-build"
+      have_libcurl="1"
+      have_libvarlink="1" ;;
    *) die "unsupported os: $os" ;;
 esac
 pck_dist="${pck_dist}${usr_distro:+.$usr_distro}"
@@ -180,8 +189,17 @@ esac
 $pck_install $pcks_dev
 
 # create a non-root user for building the software (developer) ...
-groupadd -g $usr_gid developers
-useradd -m -g $usr_gid -u $usr_uid -c Developer -s /bin/bash developer
+case $os in
+   alpine-*)
+      addgroup -g 1000 developers
+      adduser -D -G developers -u 1000 -s /bin/sh developer
+      addgroup developer abuild
+      #abuild-keygen -a -i
+   ;;
+   *) groupadd -g $usr_gid developers
+      useradd -m -g $usr_gid -u $usr_uid -s /bin/bash developer
+   ;;
+esac
 
 # ... and switch to this user
 su - developer -c '
@@ -189,7 +207,28 @@ msg () { echo \"*** info: \$1\"; }
 
 mkdir -p $targetdir
 
-if [ \"'$pck_format'\" = rpm ] && [ \"'$specfile'\" ]; then
+if [ \"'$pck_format'\" = apk ]; then
+   mkdir -p ~/${pckname}
+   cp -p $shared_disk_container/${pckname}*.tar.* ~/${pckname}
+   cp -p $shared_disk_container/$specfile ~/${pckname}
+
+   msg \"creating the required abuild certificates ...\"
+   abuild-keygen -n -a
+   cat .abuild/abuild.conf
+   echo
+   find /home/developer/.abuild/ -name \"*rsa*\" -exec cat {} \\;
+   echo
+
+   msg \"creating the apk packages ...\"
+   cd ~/${pckname}
+   abuild checksum
+   abuild -r
+
+   if [ \"'$targetdir'\" ]; then
+      msg \"copying the apk packages to the target folder ...\"
+      cp -p ../packages/developer/$(arch)/*.apk $targetdir
+   fi
+elif [ \"'$pck_format'\" = rpm ] && [ \"'$specfile'\" ]; then
    mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
    cp -p $shared_disk_container/$specfile ~/rpmbuild/SPECS/
    cp -p $shared_disk_container/${pckname}*.tar.* ~/rpmbuild/SOURCES/
@@ -200,6 +239,7 @@ if [ \"'$pck_format'\" = rpm ] && [ \"'$specfile'\" ]; then
       --define=\"dist $pck_dist\" \
       --define=\"_topdir \$HOME/rpmbuild\" \
       --define=\"have_libcurl $have_libcurl\" \
+      --define=\"have_libvarlink $have_libvarlink\" \
       -ba ${pckname}.spec
 
    msg \"testing the installation of the rpm packages ...\"

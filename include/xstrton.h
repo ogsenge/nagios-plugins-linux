@@ -1,4 +1,5 @@
-/* strtol with error checking
+// SPDX-License-Identifier: GPL-3.0-or-later
+/* xstrton.h -- string to double and long conversion with error checking
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,26 +14,18 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#include <errno.h>
-#include <stdlib.h>
+#ifndef XSTRTON_H_
+# define XSTRTON_H_
 
-#include "common.h"
-#include "messages.h"
+# ifdef __cplusplus
+extern "C" {
+# endif
 
-/* same as strtol(3) but exit on failure instead of returning crap */
-long
-strtol_or_err (const char *str, const char *errmesg)
-{
-  char *end = NULL;
+  double strtod_or_err (const char *str, const char *errmesg);
+  long strtol_or_err (const char *str, const char *errmesg);
 
-  if (str != NULL && *str != '\0')
-    {
-      errno = 0;
-      long num = strtol (str, &end, 10);
-      if (errno == 0 && str != end && end != NULL && *end == '\0')
-        return num;
-    }
-
-  plugin_error (STATE_UNKNOWN, errno, "%s: '%s'", errmesg, str);
-  return 0;
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* XSTRTON_H_ */

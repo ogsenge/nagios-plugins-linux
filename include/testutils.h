@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 /* testutils.h -- a simple framework for unit testing
 
    This program is free software: you can redistribute it and/or modify
@@ -41,9 +42,19 @@
 #define NPL_TEST_PATH_PROCMEMINFO abs_srcdir "/ts_procmeminfo.data"
 #define NPL_TEST_PATH_PROCVMSTAT abs_srcdir "/ts_procvmstat.data"
 #define NPL_TEST_PATH_SYSDOCKERMEMSTAT abs_srcdir "/ts_sysdockermemstat.data"
+#define NPL_TEST_PATH_PROCPRESSURE_CPU abs_srcdir "/ts_procpressurecpu.data"
+#define NPL_TEST_PATH_PROCPRESSURE_IO abs_srcdir "/ts_procpressureio.data"
 
 /* simulate the test of a query to the docker rest API */
 #define NPL_TEST_PATH_CONTAINER_JSON abs_srcdir "/ts_container_docker.data"
+
+/* simulate the test of a query to varlink */
+#define NPL_TEST_PATH_PODMAN_GETCONTAINERSBYSTATUS_JSON \
+	abs_srcdir "/ts_container_podman_GetContainersByStatus.data"
+#define NPL_TEST_PATH_PODMAN_GETCONTAINERSTATS_JSON \
+	abs_srcdir "/ts_container_podman_GetContainerStats.data"
+#define NPL_TEST_PATH_PODMAN_LISTCONTAINERS_JSON \
+	abs_srcdir "/ts_container_podman_ListContainers.data"
 
 #define TEST_ASSERT_EQUAL_NUMERIC(A, B) \
   do { if ((A) != (B)) ret = -1; } while (0)

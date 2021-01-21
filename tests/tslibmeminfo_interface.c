@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 /*
  * License: GPLv3+
  * Copyright (c) 2017 Davide Madrisan <davide.madrisan@gmail.com>
@@ -21,7 +22,7 @@
 
 #include "testutils.h"
 
-#ifdef PROC_MEMINFO
+#if defined (PROC_MEMINFO) && !defined (HAVE_LIBPROCPS)
 
 # define NPL_TESTING
 #  include "../lib/meminfo.c"
@@ -135,4 +136,4 @@ main (void)
   return EXIT_AM_SKIP;
 }
 
-#endif		/* PROC_MEMINFO */
+#endif

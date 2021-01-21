@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 /*
  * License: GPLv3+
  * Copyright (c) 2013,2015 Davide Madrisan <davide.madrisan@gmail.com>
@@ -24,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -259,6 +261,8 @@ check_for_faulty_paths (char *buf, size_t bufsize)
 	}
     }
 
+  /* free memory allocated to the pattern buffer by regcomp() */
+  regfree (&regex);
   return faulty_paths;
 }
 

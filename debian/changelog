@@ -1,3 +1,28 @@
+nagios-plugins-linux (28-1) stable; urgency=low
+  * Release 28 "Alpine Hike":
+     - New plugin check_pressure for checking Linux PSI.
+     - Sparse Clang and GCC warning fixes.
+
+ -- Davide Madrisan <davide.madrisan@gmail.com>  Sat, 12 Dec 2020 14:14:00 +0200
+
+nagios-plugins-linux (27-1) stable; urgency=low
+  * Release 27 "Polish Landscapes":
+     - Enhanced plugin check_network (using rtnetlink).
+     - Fixed experimental support to libprocps-ng:newlib.
+
+ -- Davide Madrisan <davide.madrisan@gmail.com>  Sat,  8 Aug 2020 10:45:45 +0200
+
+nagios-plugins-linux (26-1) stable; urgency=low
+  * Release 26 "Lockdown release":
+     - Fix build with musl by including limits.h when PATH_MAX is used.
+     - Fix build when '-fno-common' is added to CFLAGS.
+     - Fix travis CI build.
+     - New plugin check_podman for checking some runtime metrics of podman
+       containers.
+     - Add Fedora 32 and CentOS 8 to the supported distributions.
+
+ -- Davide Madrisan <davide.madrisan@gmail.com>  Tue,  5 May 2020 18:33:03 +0200
+
 nagios-plugins-linux (25-1) stable; urgency=low
   * Release 25 "Gentoo release":
      - sysfsparser lib: fix debug messages in

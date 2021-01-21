@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 /*
  * License: GPLv3+
  * Copyright (c) 2014,2015 Davide Madrisan <davide.madrisan@gmail.com>
@@ -36,7 +37,7 @@
 #include "progname.h"
 #include "progversion.h"
 #include "thresholds.h"
-#include "xstrtol.h"
+#include "xstrton.h"
 
 #define MIN(a,b) \
   ({ __typeof__ (a) _a = (a); \

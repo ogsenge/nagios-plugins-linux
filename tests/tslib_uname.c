@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 /*
  * License: GPLv3+
  * Copyright (c) 2016 Davide Madrisan <davide.madrisan@gmail.com>
@@ -23,6 +24,20 @@
 #include <sys/utsname.h>
 
 #include "testutils.h"
+
+/*
+ * SUSv3 specifies uname(), but leaves the lengths of the various fields
+ * of the utsname structure undefined, requiring only that the strings be
+ * terminated by a null byte.  On Linux, these fields are each 65 bytes
+ * long; including space for terminating null byte.
+ * Glibc declares a variable _UTSNAME_[A-Z]*_LENGTH for each field, all
+ * equal to _UTSNAME_LENGTH which in turn equals to 65.
+ * Musl libc (shipped by Linux Alpine) does not declare any length variable
+ * but hardcodes this value in each field definition.
+ */
+#if !defined _UTSNAME_RELEASE_LENGTH && defined LIBC_MUSL
+# define _UTSNAME_RELEASE_LENGTH 65
+#endif
 
 int
 uname (struct utsname *__name)

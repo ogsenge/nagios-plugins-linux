@@ -36,7 +36,9 @@ noinst_HEADERS = \
 	mountlist.h \
 	messages.h \
 	netinfo.h \
+	netinfo-private.h \
 	perfdata.h \
+	pressure.h \
 	processes.h \
 	procparser.h \
 	progname.h \
@@ -52,4 +54,4 @@ noinst_HEADERS = \
 	vminfo.h \
 	xalloc.h \
 	xasprintf.h \
-	xstrtol.h
+	xstrton.h

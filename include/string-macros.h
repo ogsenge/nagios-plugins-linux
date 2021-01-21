@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 /* string-macros.h -- a collection of macros for checking strings
 
    This program is free software: you can redistribute it and/or modify
@@ -16,11 +17,20 @@
 #ifndef _STRING_MACROS_H
 # define _STRING_MACROS_H     1
 
+#include "system.h"
+
 # define STRCONTAINS(a, b) (NULL != strpbrk(a, b))
 # define STREQ(a, b) (strcmp(a, b) == 0)
 # define STRNEQ(a, b) (strcmp(a, b) != 0)
 # define STREQLEN(a, b, n) (strncmp(a, b, n) == 0)
 # define STRNEQLEN(a, b, n) (strncmp(a, b, n) != 0)
 # define STRPREFIX(a, b) (strncmp(a, b, strlen(b)) == 0)
+
+/* Use strncpy with N-1 and ensure the string is terminated.  */
+#define STRNCPY_TERMINATED(DEST, SRC, N) \
+  do { \
+    strncpy (DEST, SRC, N - 1); \
+    DEST[N - 1] = '\0'; \
+  } while (false)
 
 #endif			/* _STRING_MACROS_H */

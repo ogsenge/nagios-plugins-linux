@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 /*
  * License: GPLv3+
  * Copyright (c) 2018 Davide Madrisan <davide.madrisan@gmail.com>
@@ -36,7 +37,7 @@
 #include "units.h"
 #include "xalloc.h"
 #include "xasprintf.h"
-#include "xstrtol.h"
+#include "xstrton.h"
 
 static const char *program_copyright =
   "Copyright (C) 2018 Davide Madrisan <" PACKAGE_BUGREPORT ">\n";

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 /* xalloc.h -- malloc with out-of-memory checking
 
    Copyright (C) 1990-2000, 2003-2004, 2006-2012 Free Software Foundation, Inc.
@@ -27,6 +28,8 @@ extern "C" {
   void *xmemdup (void const *p, const size_t s)
 	_attribute_malloc_ _attribute_alloc_size_ ((2));
   char *xstrdup (char const *str)
+	_attribute_malloc_;
+  char *xsubstrdup (char const *start, const size_t s)
 	_attribute_malloc_;
   void *xnmalloc (const size_t n, const size_t s)
 	_attribute_malloc_ _attribute_alloc_size_ ((1, 2));

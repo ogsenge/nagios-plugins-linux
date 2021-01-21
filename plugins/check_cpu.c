@@ -1,6 +1,7 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 /*
  * License: GPLv3+
- * Copyright (c) 2014,2015 Davide Madrisan <davide.madrisan@gmail.com>
+ * Copyright (c) 2014,2015,2020 Davide Madrisan <davide.madrisan@gmail.com>
  *
  * A Nagios plugin to check the CPU utilization.
  *
@@ -43,10 +44,11 @@
 #include "progname.h"
 #include "progversion.h"
 #include "thresholds.h"
+#include "string-macros.h"
 #include "system.h"
 #include "xalloc.h"
 #include "xasprintf.h"
-#include "xstrtol.h"
+#include "xstrton.h"
 
 static const char *program_copyright =
   "Copyright (C) 2014,2015 Davide Madrisan <" PACKAGE_BUGREPORT ">\n";
@@ -255,13 +257,13 @@ main (int argc, char **argv)
   set_program_name (argv[0]);
 
   len = strlen (program_name);
-  if (len > 6 && !strncmp (program_name, "check_", 6))
+  if (len > 6 && STRPREFIX (program_name, "check_"))
     p = (char *) program_name + 6;
   else
     plugin_error (STATE_UNKNOWN, 0,
 		  "bug: the plugin does not have a standard name");
 
-  if (!strncmp (p, "iowait", 6))	/* check_iowait --> cpu_iowait */
+  if (STRPREFIX (p, "iowait"))		/* check_iowait --> cpu_iowait */
     {
       cpu_progname = xstrdup ("iowait");
       program_shorthelp =

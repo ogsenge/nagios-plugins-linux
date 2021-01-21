@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 /*  collection.h -- dictionary for counting hashable objects (strings)
 
     This program is free software: you can redistribute it and/or modify
@@ -40,7 +41,7 @@ extern "C"
   hashtable_t *counter_create (void);
   void counter_free (hashtable_t * hashtable);
 
-  hashable_t *counter_lookup (const hashtable_t * hashtable, const char *s);
+  hashable_t *counter_lookup (const hashtable_t * hashtable, const char *key);
   hashable_t *counter_put (hashtable_t * hashtable, const char *key,
 			   unsigned long increment);
   unsigned int counter_get_elements (const hashtable_t * hashtable);
