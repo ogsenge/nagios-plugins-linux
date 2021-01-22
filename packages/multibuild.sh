@@ -128,6 +128,10 @@ container_start "$container"
 ipaddr="$(container_property --ipaddr "$container")"
 os="$(container_property --os "$container")"
 
+if [[ $container =~ oraclelinux.* ]]; then
+  os=${container}
+fi
+
 case "$os" in
    alpine-*)
       pck_format="apk"
@@ -143,6 +147,14 @@ case "$os" in
       pcks_dev="bzip2 make gcc libcurl-devel xz rpm-build"
       # requires libcurl-devel 7.40.0+ which is not available in < CentOS 8
       case "$os" in centos-8.*) have_libcurl="1" ;; *) have_libcurl="0" ;; esac
+      have_libvarlink="0"
+   ;;
+   oraclelinux*)
+      pck_format="rpm"
+      pck_install="yum install -y"
+      pck_dist=".el${os:12:1}"
+      pcks_dev="tar bzip2 make gcc libcurl-devel xz rpm-build"
+      have_libcurl="0"
       have_libvarlink="0"
    ;;
    debian-*)
