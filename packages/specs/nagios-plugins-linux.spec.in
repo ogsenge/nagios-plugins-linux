@@ -211,6 +211,13 @@ Group: Applications/System
 %description users
 This Nagios plugin displays the number of users that are currently logged on.
 
+%package pressure
+Summary: Nagios plugins for Linux - check_pressure
+Group: Applications/System
+
+%description pressure
+This Nagios plugin displays the current IO pressure.
+
 %prep
 %setup -q
 
@@ -321,6 +328,10 @@ make DESTDIR=%{buildroot} install
 %files users
 %defattr(-,root,root)
 %{_libdir}/nagios/plugins/check_users
+
+%files pressure
+%defattr(-,root,root)
+%{_libdir}/nagios/plugins/check_pressure
 
 %changelog
 
